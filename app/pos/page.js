@@ -104,7 +104,6 @@ export default function Home() {
   return (
     <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
       <div className="card">
-        <img className="card-img-top" src="..." alt="Possy Image" />
         <div className="card-body">
           <div className="row w-100">
             <h1 className="text-end">TOTAL: {totalAmount}.00</h1>
