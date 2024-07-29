@@ -1,0 +1,117 @@
+.product-btn{
+    height: 7rem;
+}
+
+.product-btn-top{
+    height: 5rem;
+}
+
+.action-btn{
+    height: 5rem;
+}
+
+.product-btn-price{
+    margin-top: 10px;
+}
+
+.customer-info{
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.total-section{
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.btn-product-bottom{
+    height: 5rem;
+}
+
+html, body {
+    background: #e3e3d8;
+    font-family: sans-serif;
+    padding: 25px;
+}
+
+.wrapper {
+    width: 150px;
+    height: 200px;
+    background: white;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px 10px 10px 10px;
+    box-shadow: 0;
+    transform: scale(0.95);
+    transition: box-shadow 0.5s, transform 0.5s;
+}
+
+.wrapper:hover {
+    transform: scale(1);
+    box-shadow: 5px 20px 30px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.wrapper .container {
+    width: 80%;
+    height: 80%;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+}
+
+.wrapper .container .top {
+    height: 75%;
+    width: 100%;
+    background: url(https://s-media-cache-ak0.pinimg.com/736x/49/80/6f/49806f3f1c7483093855ebca1b8ae2c4.jpg) no-repeat center center;
+    -webkit-background-size: 100%;
+    -moz-background-size: 100%;
+    -o-background-size: 100%;
+    background-size: 100%;
+}
+
+.wrapper .container .bottom {
+    width: 200%;
+    height: 20%;
+    transition: transform 0.5s;
+}
+
+.wrapper .container .bottom.clicked {
+    transform: translateX(-50%);
+}
+
+.wrapper .container .bottom h1 {
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper .container .bottom p {
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper .container .bottom .left {
+    height: 100%;
+    width: 50%;
+    position: relative;
+    float: left;
+}
+
+.wrapper .container .bottom .left .details {
+    float: left;
+    width: calc(70% - 40px);
+}
+
+@media (min-width: 768px) {
+  .col-2.mb-5.me-4 {
+    margin-right: 2rem !important;
+  }
+  
+  .col-2.mb-5.ms-4 {
+    margin-left: 2rem !important;
+  }
+}
