@@ -10,84 +10,124 @@ const Pos2 = () => {
       <div className="row">
         <div className="col-md-4">
           <div className="customer-info mb-3">
-            <h4>Aiahkins</h4>
-            <p>Customer No.</p>
+            <div class="card text-center bg-light border-0">
+              <img
+                src="/assets/aiah.jpg"
+                className="card-img-top img-thumbnail mx-auto d-block mt-2"
+                alt="bg"
+                style={{ width: "150px", height: "150px", borderRadius: "50%" }}
+              />
 
-            <div className="row">
-              <div className="col-4">
-                STORE SALES
-                <br />
-                ₱0.00
-              </div>
-              <div className="col-4">
-                STORE REWARDS
-                <br />0
-              </div>
-              <div className="col-4">
-                CUSTOMER COUNT
-                <br />0
-              </div>
-            </div>
+              <div class="card-body">
+                <h4>Aiahkins</h4>
+                <p>Cashier No: 143</p>
 
-            <div className="row mt-3 align-items-center justify-content-center">
-              <div className="col-4">
-                <button className="btn btn-warning btn-lg w-100">
-                  <i class="bi bi-credit-card-2-back"></i>
-                </button>
-              </div>
-              <div className="col-4"> 
-                <button className="btn btn-warning btn-lg">
-                  <span className="fs-6">PURCHASES</span>
-                </button>
+                <div className="row">
+                  <div className="col-4">
+                    STORE SALES
+                    <br />
+                    ₱0.00
+                  </div>
+                  <div className="col-4">
+                    STORE REWARDS
+                    <br />0
+                  </div>
+                  <div className="col-4">
+                    CUSTOMER COUNT
+                    <br />0
+                  </div>
+                </div>
+
+                <div className="row mt-3 align-items-center justify-content-center">
+                  <div className="col-4">
+                    <button className="btn btn-warning btn-lg w-100">
+                      <i class="bi bi-credit-card-2-back"></i>
+                    </button>
+                  </div>
+                  <div className="col-4">
+                    <button className="btn btn-success btn-lg">
+                      <span className="fs-6">PURCHASES</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="purchases mb-3">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">Item Name</th>
-                  <th scope="col">Item Code</th>
-                  <th scope="col">Quantity</th>
-                  <th scope="col">Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>BINI ALBUM</td>
-                  <td>1001</td>
-                  <td>1</td>
-                  <td>₱100.00</td>
-                </tr>
-                <tr>
-                  <td>BINI ALBUM</td>
-                  <td>1001</td>
-                  <td>1</td>
-                  <td>₱100.00</td>
-                </tr>
-                <tr>
-                  <td>BINI ALBUM</td>
-                  <td>1001</td>
-                  <td>1</td>
-                  <td>₱100.00</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="card overflow-y-scroll" style={{ maxHeight: "20rem" }}>
+            <div class="card-body">
+              <h5 class="card-title">CART:</h5>
+              <div className="purchases mb-3">
+                <table className="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th scope="col">Item Name</th>
+                      <th scope="col">Item Code</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>BINI ALBUM</td>
+                      <td>1001</td>
+                      <td>1</td>
+                      <td>₱100.00</td>
+                    </tr>
+                    <tr>
+                      <td>BINI ALBUM</td>
+                      <td>1001</td>
+                      <td>1</td>
+                      <td>₱100.00</td>
+                    </tr>
+                    <tr>
+                      <td>BINI ALBUM</td>
+                      <td>1001</td>
+                      <td>1</td>
+                      <td>₱100.00</td>
+                    </tr>
+                    <tr>
+                      <td>BINI ALBUM</td>
+                      <td>1001</td>
+                      <td>1</td>
+                      <td>₱100.00</td>
+                    </tr>
+                    <tr>
+                      <td>BINI ALBUM</td>
+                      <td>1001</td>
+                      <td>1</td>
+                      <td>₱100.00</td>
+                    </tr>
+                    <tr>
+                      <td>BINI ALBUM</td>
+                      <td>1001</td>
+                      <td>1</td>
+                      <td>₱100.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
-          <div className="total-section">
-            <div className="d-flex justify-content-between">
-              <span>TOTAL</span>
-              <span>₱300.00</span>
-            </div>
-            <div className="d-flex justify-content-between">
-              <span>DISCOUNT</span>
-              <span>₱0.00</span>
-            </div>
-            <div className="d-flex justify-content-between">
-              <span>TAX</span>
-              <span>₱76.78</span>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">TOTAL BREAKDOWN</h5>
+              <div className="total-section">
+                <div className="d-flex justify-content-between">
+                  <h5 class="card-subtitle mb-2 text-body-secondary">TOTAL</h5>
+                  <h5 class="card-subtitle mb-2 text-body-secondary"> <span>₱300.00</span></h5>
+                 
+                </div>
+                <div className="d-flex justify-content-between">
+                  <span>DISCOUNT</span>
+                  <span>₱0.00</span>
+                </div>
+                <div className="d-flex justify-content-between">
+                  <span>TAX</span>
+                  <span>₱76.78</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -324,12 +364,12 @@ const Pos2 = () => {
           </div>
           <div className="row">
             <div className="col-3">
-              <button className="btn btn-warning btn-product-bottom btn-lg w100">
+              <button className="btn btn-warning btn-product-bottom btn-lg w-100">
                 <i className="bi bi-people"></i>
               </button>
             </div>
             <div className="col-3">
-              <button className="btn btn-danger btn-product-bottom btn-md w-100">
+              <button className="btn btn-danger btn-product-bottom btn-lg w-100">
                 <i className="bi bi-lock"></i>
               </button>
             </div>
