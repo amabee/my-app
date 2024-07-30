@@ -5,34 +5,48 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../public/styles/pos2-style.css";
 import InformationModal from "@/components/modal";
 import axios from "axios";
+import usePosState from "./posState/posState";
 
 const Pos2 = () => {
-  // MODALS
-  const [showInfoModal, setShowInfoModal] = useState(false);
-  const handleShow = () => setShowInfoModal(true);
-  const handleClose = () => setShowInfoModal(false);
+  const {
+    barcode,
+    setBarcode,
+    product,
+    setProduct,
+    quantity,
+    setQuantity,
+    orders,
+    setOrders,
+    totalAmount,
+    setTotalAmount,
+    cash,
+    setCash,
+    totalChange,
+    setTotalChange,
+    previousSales,
+    setPreviousSales,
+    quantityInputRef,
+    nextRef,
+    textColor,
+    setTextColor,
+    showInfoModal,
+    setShowInfoModal,
+    showInputItemModal,
+    setShowInputItemModal,
+    handleShow,
+    handleClose,
+    handleShowInputModal,
+    handleCloseInputModal,
+    heldTransactions,
+    setHeldTransactions,
+    msg,
+    setMsg,
+    showHeldTransactions,
+    setShowHeldTransactions,
+    handleShowHeldTransactions,
+    handleCloseHeldTransactions,
+  } = usePosState();
 
-  const [showInputItemModal, setShowInputItemModal] = useState(false);
-  const handleShowInputModal = () => setShowInputItemModal(true);
-  const handleCloseInputModal = () => setShowInputItemModal(false);
-
-  // POS FUNCTIONS
-  const [barcode, setBarcode] = useState(1);
-  const [product, setProduct] = useState({});
-  const [quantity, setQuantity] = useState(1);
-  const [orders, setOrders] = useState([]);
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [cash, setCash] = useState("");
-  const [totalChange, setTotalChange] = useState(0);
-  const [previousSales, setPreviousSales] = useState(0);
-  const quantityInputRef = useRef(null);
-  const nextRef = useRef(null);
-  const [textColor, setTextColor] = useState({ color: "red" });
-
-  // HOLDING ITEMS
-  const [heldTransactions, setHeldTransactions] = useState([]);
-
-  const [msg, setMsg] = useState("");
   const url = "http://localhost/pos-api/api.php";
 
   const getProductsFromAPI = async (barCode) => {
@@ -122,7 +136,7 @@ const Pos2 = () => {
 
   const handleF2Press = (e) => {
     if (e.key === "F2") {
-      setPreviousSales(previousSales + totalAmount);
+      //setPreviousSales(previousSales + totalAmount);
       setOrders([]);
       setTotalAmount(0);
     }
@@ -151,7 +165,12 @@ const Pos2 = () => {
 
       case "F3":
         e.preventDefault();
-        alert("Not implemented");
+        holdTransaction();
+        break;
+
+      case "F4":
+        e.preventDefault();
+        handleShowHeldTransactions();
         break;
 
       case "Escape":
@@ -211,32 +230,26 @@ const Pos2 = () => {
                       <h4>Aiahkins</h4>
                       <p>Cashier No: 143</p>
 
-                      <div className="row">
-                        <div className="col-4">
+                      <div className="row justify-content-center">
+                        <div className="col-auto">
                           STORE SALES
                           <br />₱{previousSales}
                         </div>
-                        <div className="col-4">
-                          STORE REWARDS
-                          <br />0
-                        </div>
-                        <div className="col-4">
+                        <div className="col-auto">
                           CUSTOMER COUNT
                           <br />0
                         </div>
                       </div>
 
                       <div className="row mt-3 align-items-center justify-content-center">
-                        <div className="col-4">
-                          <button className="btn btn-warning btn-lg w-100">
-                            <i className="bi bi-credit-card-2-back"></i>
-                          </button>
-                        </div>
-                        <div className="col-4">
-                          <button className="btn btn-success btn-lg">
-                            <span className="fs-6">PURCHASES</span>
-                          </button>
-                        </div>
+                        <button
+                          className="btn btn-success"
+                          style={{ width: "200px" }}
+                        >
+                          <span className="fs-6">
+                            HELD TRANSACTION {heldTransactions.length}
+                          </span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -412,6 +425,36 @@ const Pos2 = () => {
               ></input>
             </div>
           </div>
+        </InformationModal>
+        <InformationModal
+          animation={true}
+          centered={true}
+          show={showHeldTransactions}
+          handleClose={handleCloseHeldTransactions}
+          title="Held Items"
+        >
+          <table class="table table-success">
+            <thead>
+              <tr>
+                <th scope="col">Item Barcode</th>
+                <th scope="col">Item name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {heldTransactions.map((transaction, index) =>
+                transaction.map((item) => (
+                  <tr key={item.barcode}>
+                    <td>{item.barcode}</td>
+                    <td>{item.p_name}</td>
+                    <td>{item.price}</td>
+                    <td>{item.quantity}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </InformationModal>
         ;
       </div>
