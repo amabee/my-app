@@ -21,7 +21,6 @@ export default function Home() {
   const [previousSales, setPreviousSales] = useState(0);
   const quantityInputRef = useRef(null);
   const nextRef = useRef(null);
-  const back2Zero = useRef(null);
   const [textColor, setTextColor] = useState({ color: "red" });
 
 
