@@ -29,10 +29,13 @@ const Pos2 = () => {
   const nextRef = useRef(null);
   const [textColor, setTextColor] = useState({ color: "red" });
 
+  // HOLDING ITEMS
+  const [heldTransactions, setHeldTransactions] = useState([]);
+
   const [msg, setMsg] = useState("");
+  const url = "http://localhost/pos-api/api.php";
 
   const getProductsFromAPI = async (barCode) => {
-    const url = "http://localhost/pos-api/api.php";
     try {
       const response = await axios.get(url, {
         params: {
@@ -55,6 +58,23 @@ const Pos2 = () => {
     }
   };
 
+  const holdTransaction = () => {
+    if (orders.length > 0) {
+      setHeldTransactions([...heldTransactions, orders]);
+      setOrders([]);
+      setBarcode("");
+      setProduct({});
+      setQuantity(1);
+      setTotalAmount(0);
+    }
+  };
+
+  const restoreTransaction = (index) => {
+    const transactionToRestore = heldTransactions[index];
+    setHeldTransactions(heldTransactions.filter((_, i) => i !== index));
+    setOrders(transactionToRestore);
+  };
+
   const handleBarcodeChange = (e) => {
     const enteredBarcode = e.target.value;
     setBarcode(enteredBarcode);
@@ -64,6 +84,10 @@ const Pos2 = () => {
       setProduct({});
       setMsg("Please enter a barcode");
     }
+  };
+
+  const handleQuantityChange = (e) => {
+    setQuantity(Number(e.target.value));
   };
 
   const handleEscKeyPress = (e) => {
@@ -78,7 +102,42 @@ const Pos2 = () => {
     }
   };
 
+  const handleEnterKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (product.p_name) {
+        const newOrder = {
+          ...product,
+          quantity,
+          amount: product.price * quantity,
+        };
+        setOrders([...orders, newOrder]);
+        setBarcode("");
+        setProduct({});
+        setQuantity(1);
+        quantityInputRef.current.focus();
+      }
+    }
+  };
+
+  const handleF2Press = (e) => {
+    if (e.key === "F2") {
+      setPreviousSales(previousSales + totalAmount);
+      setOrders([]);
+      setTotalAmount(0);
+    }
+
+    console.log("Previous Sales: " + previousSales);
+    console.log("Total Amount: " + totalAmount);
+  };
+
   const handleFunctionsPress = (e) => {
+    if (e.ctrlKey && e.key === "f") {
+      e.preventDefault();
+      handleShowInputModal();
+      return;
+    }
+
     switch (e.key) {
       case "F1":
         e.preventDefault();
@@ -87,12 +146,12 @@ const Pos2 = () => {
 
       case "F2":
         e.preventDefault();
-        handleShowInputModal();
+        handleF2Press(e);
         break;
 
       case "F3":
         e.preventDefault();
-        getDataFromAPI();
+        alert("Not implemented");
         break;
 
       case "Escape":
@@ -103,19 +162,36 @@ const Pos2 = () => {
   };
 
   useEffect(() => {
+    const total = orders.reduce((acc, order) => acc + order.amount, 0);
+    setTotalAmount(total);
+  }, [orders]);
+
+  useEffect(() => {
     window.addEventListener("keydown", handleFunctionsPress);
     return () => {
       window.removeEventListener("keydown", handleFunctionsPress);
     };
-  }, []);
+  }, [previousSales, totalAmount]);
 
   return (
     <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
       <div className="container-fluid">
-        <h1 className="text-center fw-bold">ROBINSONS GALLERIA MALL</h1>
+        <h1 className="text-center fw-bold">ROBINSONS BIRINGAN MALL</h1>
         <div className="card">
           <div className="card-body">
-            <h1 className="card-title text-end">Total: 0.00</h1>
+            <div className="row d-flex justify-content-between align-items-center">
+              <div className="col-auto">
+                <img
+                  src="/assets/robinsons.png"
+                  style={{ width: "350px" }}
+                  alt="Robinsons Malls"
+                />
+              </div>
+              <div className="col-auto">
+                <h1 className="card-title m-0">Total: {totalAmount}.00</h1>
+              </div>
+            </div>
+
             <div className="row">
               <div className="col-md-4">
                 <div className="customer-info mb-3">
@@ -138,8 +214,7 @@ const Pos2 = () => {
                       <div className="row">
                         <div className="col-4">
                           STORE SALES
-                          <br />
-                          ₱0.00
+                          <br />₱{previousSales}
                         </div>
                         <div className="col-4">
                           STORE REWARDS
@@ -189,12 +264,14 @@ const Pos2 = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td>BINI ALBUM</td>
-                              <td>1001</td>
-                              <td>1</td>
-                              <td>₱100.00</td>
-                            </tr>
+                            {orders.map((order, index) => (
+                              <tr key={index}>
+                                <td>{order.quantity}</td>
+                                <td>{order.p_name}</td>
+                                <td>{order.price}</td>
+                                <td>{order.amount}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
@@ -212,9 +289,11 @@ const Pos2 = () => {
                             className="form-control"
                             id="quantity"
                             value={quantity}
-                            // onChange={handleQuantityChange}
+                            onChange={handleQuantityChange}
                             placeholder="Enter quantity"
-                            // ref={quantityInputRef}
+                            ref={quantityInputRef}
+                            autoFocus={true}
+                            onKeyPress={handleEnterKeyPress}
                             // onKeyPress={handlePlusKeyPress}
                           />
                         </div>
