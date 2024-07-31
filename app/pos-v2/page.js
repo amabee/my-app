@@ -6,6 +6,7 @@ import "../../public/styles/pos2-style.css";
 import InformationModal from "@/components/modal";
 import axios from "axios";
 import usePosState from "./posState/posState";
+import Swal from "sweetalert2";
 
 const Pos2 = () => {
   const {
@@ -45,6 +46,12 @@ const Pos2 = () => {
     setShowHeldTransactions,
     handleShowHeldTransactions,
     handleCloseHeldTransactions,
+    customerID,
+    setCustomerID,
+    showCustomerIDInput,
+    setShowCustomerIDInput,
+    handleShowCustomerIDInput,
+    handleCloseCustomerIDInput,
   } = usePosState();
 
   const url = "http://localhost/pos-api/api.php";
@@ -70,6 +77,43 @@ const Pos2 = () => {
       setProduct({});
       setMsg("Error fetching data");
     }
+  };
+
+
+  const saveSomeItems = async (cuid,items) => {
+    try {
+      const response = await axios.post(
+        url,
+        {
+          op: "saveSomeItems",
+          cashierID: "02-1920-03954",
+          customerID: cuid,
+          items: items,
+        },
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+
+      console.log(response.data.success);
+
+      if (response.data.success) {
+        Swal.fire({
+          title: "Success!",
+          text: "Do you want to continue?",
+          icon: "success",
+          confirmButtonText: "Cool",
+        });
+      }
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  };
+
+  const handleCustomerInput = (event) => {
+    setCustomerID(event.target.value);
   };
 
   const holdTransaction = () => {
@@ -113,23 +157,41 @@ const Pos2 = () => {
       if (handleShowInputModal) {
         handleCloseInputModal();
       }
+
+      if (handleShowHeldTransactions) {
+        handleCloseHeldTransactions();
+      }
     }
   };
 
   const handleEnterKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (product.p_name) {
-        const newOrder = {
-          ...product,
-          quantity,
-          amount: product.price * quantity,
-        };
-        setOrders([...orders, newOrder]);
-        setBarcode("");
-        setProduct({});
-        setQuantity(1);
-        quantityInputRef.current.focus();
+      if (handleShowInputModal) {
+        if (product.p_name) {
+          const newOrder = {
+            ...product,
+            quantity,
+            amount: product.price * quantity,
+          };
+          setOrders([...orders, newOrder]);
+          setBarcode("");
+          setProduct({});
+          setQuantity(1);
+          quantityInputRef.current.focus();
+        }
+      }
+    }
+  };
+
+  const handleSaveSomeItemsKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (handleShowCustomerIDInput) {
+        holdTransaction();
+        saveSomeItems(customerID,orders);
+
+        handleCloseCustomerIDInput();
       }
     }
   };
@@ -165,12 +227,27 @@ const Pos2 = () => {
 
       case "F3":
         e.preventDefault();
-        holdTransaction();
+        handleShowCustomerIDInput();
         break;
 
       case "F4":
         e.preventDefault();
         handleShowHeldTransactions();
+        break;
+
+      case "F5":
+        e.preventDefault();
+        restoreTransaction();
+        break;
+
+      case "F6":
+        e.preventDefault();
+        
+        break;
+
+      case "F7":
+        e.preventDefault();
+        saveSomeItems();
         break;
 
       case "Escape":
@@ -279,10 +356,10 @@ const Pos2 = () => {
                           <tbody>
                             {orders.map((order, index) => (
                               <tr key={index}>
-                                <td>{order.quantity}</td>
                                 <td>{order.p_name}</td>
+                                <td>{order.barcode}</td>
+                                <td>{order.quantity}</td>
                                 <td>{order.price}</td>
-                                <td>{order.amount}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -342,6 +419,7 @@ const Pos2 = () => {
             </div>
           </div>
         </div>
+        {/* SHORTCUT KEYS HELP MODAL */}
         <InformationModal
           show={showInfoModal}
           handleClose={handleClose}
@@ -400,10 +478,27 @@ const Pos2 = () => {
                 </span>
               </div>
             </div>
-            <div className="col-md-2">Global</div>
+            <div className="col-md-2">
+              Cashiering
+              <div className="row-cols-2 mt-2 justify-content-evenly">
+                <span className="spacing">
+                  <span className="square">Ctrl</span> +{" "}
+                  <span className="square">F</span> - Find Item
+                </span>
+              </div>
+              <div className="row-cols-2 mt-2 justify-content-evenly">
+                <span className="spacing">
+                  <span className="square square-long">Enter</span> -  
+                  Punch Item
+                </span>
+              </div>
+            </div>
+
             <div className="col-md-2">Global</div>
           </div>
         </InformationModal>
+
+        {/* SEARCH ITEM MODAL */}
         <InformationModal
           show={showInputItemModal}
           handleClose={handleCloseInputModal}
@@ -426,6 +521,8 @@ const Pos2 = () => {
             </div>
           </div>
         </InformationModal>
+        
+        {/* HELD ITEMS MODAL */}
         <InformationModal
           animation={true}
           centered={true}
@@ -433,13 +530,14 @@ const Pos2 = () => {
           handleClose={handleCloseHeldTransactions}
           title="Held Items"
         >
-          <table class="table table-success">
+          <table className="table table-success">
             <thead>
               <tr>
                 <th scope="col">Item Barcode</th>
                 <th scope="col">Item name</th>
                 <th scope="col">Quantity</th>
                 <th scope="col">Price</th>
+                <th scope="col">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -448,13 +546,39 @@ const Pos2 = () => {
                   <tr key={item.barcode}>
                     <td>{item.barcode}</td>
                     <td>{item.p_name}</td>
-                    <td>{item.price}</td>
                     <td>{item.quantity}</td>
+                    <td>{item.price}</td>
+                    <td>{item.amount}</td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
+        </InformationModal>
+        
+        {/* CUSTOMER ID MODAL */}
+        <InformationModal
+          animation={true}
+          title="Enter Customer Name or ID"
+          show={showCustomerIDInput}
+          handleClose={handleCloseCustomerIDInput}
+        >
+          <div className="input-group mb-3">
+            <div className="input-group-prepend">
+              <span className="input-group-text" id="basic-addon1">
+                ID
+              </span>
+            </div>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Customer ID"
+              aria-label="Customer ID"
+              value={customerID}
+              onChange={handleCustomerInput}
+              onKeyPress={handleSaveSomeItemsKeyPress}
+            />
+          </div>
         </InformationModal>
         ;
       </div>

@@ -16,6 +16,11 @@ const usePosState = () => {
   const handleShowHeldTransactions = () => setShowHeldTransactions(true);
   const handleCloseHeldTransactions = () => setShowHeldTransactions(false);
 
+  // HOLDING TRANSACTIONS CUSTOMER ID / NAME
+  const [showCustomerIDInput, setShowCustomerIDInput] = useState(false);
+  const handleShowCustomerIDInput = () => setShowCustomerIDInput(true);
+  const handleCloseCustomerIDInput = () => setShowCustomerIDInput(false);
+
   // POS FUNCTIONS
   const [barcode, setBarcode] = useState(1);
   const [product, setProduct] = useState({});
@@ -31,6 +36,7 @@ const usePosState = () => {
 
   // HOLDING ITEMS
   const [heldTransactions, setHeldTransactions] = useState([]);
+  const [customerID, setCustomerID] = useState("");
 
   const [msg, setMsg] = useState("");
   return {
@@ -70,6 +76,12 @@ const usePosState = () => {
     setShowHeldTransactions,
     handleShowHeldTransactions,
     handleCloseHeldTransactions,
+    customerID,
+    setCustomerID,
+    showCustomerIDInput,
+    setShowCustomerIDInput,
+    handleShowCustomerIDInput,
+    handleCloseCustomerIDInput,
   };
 };
 
