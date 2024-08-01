@@ -8,6 +8,7 @@ import axios from "axios";
 import usePosState from "./posState/posState";
 import Swal from "sweetalert2";
 import { useRouter, redirect } from "next/navigation";
+import Loader from "@/components/loader";
 
 const Pos2 = () => {
   const {
@@ -138,6 +139,24 @@ const Pos2 = () => {
     const transactionToRestore = heldTransactions[index];
     setHeldTransactions(heldTransactions.filter((_, i) => i !== index));
     setOrders(transactionToRestore);
+  };
+
+  const handleCashChange = (e) => {
+    const enteredCash = Number(e.target.value);
+    setCash(enteredCash);
+    setTotalChange(enteredCash - totalAmount);
+
+    if (enteredCash > totalAmount) {
+      setTextColor({ color: "green" });
+    }
+
+    if (enteredCash < totalAmount) {
+      setTextColor({ color: "red" });
+    }
+
+    if (enteredCash == totalAmount) {
+      setTextColor({ color: "black" });
+    }
   };
 
   const handleBarcodeChange = (e) => {
@@ -278,7 +297,9 @@ const Pos2 = () => {
       router.push("/pos-v2");
     }
 
-    setLoading(false);
+    setTimeout(() => {
+      setLoading(false);
+    }, 5000);
   }, [router]);
 
   useEffect(() => {
@@ -294,7 +315,7 @@ const Pos2 = () => {
   }, [previousSales, totalAmount]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader></Loader>;
   }
 
   if (!currentUser) {
@@ -659,7 +680,29 @@ const Pos2 = () => {
                     ₱
                   </span>
                   <span className="amount" style={{ fontSize: "20px" }}>
-                   {totalAmount}.00
+                    {totalAmount}.00
+                  </span>
+                </div>
+              </div>
+              {/* CHANGE */}
+              <div className="d-flex align-items-center mb-3 p-3 border border-light rounded">
+                <div className="me-3">
+                  <span
+                    className="head"
+                    style={{ fontSize: "16px", fontWeight: "bold" }}
+                  >
+                    CHANGE
+                  </span>
+                </div>
+                <div className="d-flex align-items-center">
+                  <span
+                    className="dollar"
+                    style={{ fontSize: "20px", marginRight: "4px" }}
+                  >
+                    ₱
+                  </span>
+                  <span className="amount" style={{ fontSize: "20px" }}>
+                    {totalChange}.00
                   </span>
                 </div>
               </div>
@@ -674,6 +717,7 @@ const Pos2 = () => {
                     Enter Cash
                   </span>
                 </div>
+
                 <div className="d-flex align-items-center">
                   <span
                     className="dollar"
@@ -687,6 +731,9 @@ const Pos2 = () => {
                     className="form-control"
                     placeholder="0"
                     style={{ maxWidth: "100px" }}
+                    autoFocus={true}
+                    value={cash}
+                    onChange={handleCashChange}
                   />
                 </div>
               </div>
