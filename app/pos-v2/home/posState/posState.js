@@ -21,6 +21,11 @@ const usePosState = () => {
   const handleShowCustomerIDInput = () => setShowCustomerIDInput(true);
   const handleCloseCustomerIDInput = () => setShowCustomerIDInput(false);
 
+  // PAYMENT MODAL
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const handleShowPaymentModal = () => setShowPaymentModal(true);
+  const handleClosePaymentModal = () => setShowPaymentModal(false);
+
   // POS FUNCTIONS
   const [barcode, setBarcode] = useState(1);
   const [product, setProduct] = useState({});
@@ -82,6 +87,10 @@ const usePosState = () => {
     setShowCustomerIDInput,
     handleShowCustomerIDInput,
     handleCloseCustomerIDInput,
+    showPaymentModal,
+    setShowPaymentModal,
+    handleShowPaymentModal,
+    handleClosePaymentModal,
   };
 };
 
