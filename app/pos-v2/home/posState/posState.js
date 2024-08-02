@@ -26,6 +26,14 @@ const usePosState = () => {
   const handleShowPaymentModal = () => setShowPaymentModal(true);
   const handleClosePaymentModal = () => setShowPaymentModal(false);
 
+  // RETRIEVE ITEMS MODAL
+  const [showSavedCustomerPickerModal, setShowSavedCustomerPickerModal] =
+    useState(false);
+  const handleShowSavedCustomerPickerModal = () =>
+    setShowSavedCustomerPickerModal(true);
+  const handleCloseSavedCustomerPickerModal = () =>
+    setShowSavedCustomerPickerModal(false);
+
   // POS FUNCTIONS
   const [barcode, setBarcode] = useState(1);
   const [product, setProduct] = useState({});
@@ -91,6 +99,10 @@ const usePosState = () => {
     setShowPaymentModal,
     handleShowPaymentModal,
     handleClosePaymentModal,
+    showSavedCustomerPickerModal,
+    setShowSavedCustomerPickerModal,
+    handleShowSavedCustomerPickerModal,
+    handleCloseSavedCustomerPickerModal,
   };
 };
 

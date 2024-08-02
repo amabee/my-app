@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { Dropdown, DropdownButton } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../../public/styles/pos2-style.css";
@@ -58,6 +59,10 @@ const Pos2 = () => {
     setShowPaymentModal,
     handleShowPaymentModal,
     handleClosePaymentModal,
+    showSavedCustomerPickerModal,
+    setShowSavedCustomerPickerModal,
+    handleShowSavedCustomerPickerModal,
+    handleCloseSavedCustomerPickerModal,
   } = usePosState();
 
   const [currentUser, setCurrentUser] = useState(null);
@@ -278,7 +283,8 @@ const Pos2 = () => {
 
       case "F7":
         e.preventDefault();
-        handleShowPaymentModal();
+        // handleShowPaymentModal();
+        handleShowSavedCustomerPickerModal();
         break;
 
       case "Escape":
@@ -299,7 +305,7 @@ const Pos2 = () => {
 
     setTimeout(() => {
       setLoading(false);
-    }, 5000);
+    }, 500);
   }, [router]);
 
   useEffect(() => {
@@ -748,6 +754,23 @@ const Pos2 = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </InformationModal>
+
+
+        <InformationModal
+          title="Select Customer ID"
+          animation={true}
+          centered={true}
+          show={showSavedCustomerPickerModal}
+          handleClose={handleCloseSavedCustomerPickerModal}
+        >
+          <div className="dropdown-custom">
+            <DropdownButton id="dropdown-basic-button" title="SELECT CUSTOMER" autoFocus={true}>
+              <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+              <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+              <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+            </DropdownButton>
           </div>
         </InformationModal>
         ;
