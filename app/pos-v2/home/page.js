@@ -63,10 +63,23 @@ const Pos2 = () => {
     setShowSavedCustomerPickerModal,
     handleShowSavedCustomerPickerModal,
     handleCloseSavedCustomerPickerModal,
+    retrievedIDs,
+    setRetrievedIDs,
+    selectCustomerID,
+    setSelectedCustomerID,
+    showVoidModal,
+    setShowVoidModal,
+    handleShowVoidModal,
+    handleCloseVoidModal,
   } = usePosState();
 
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedRow, setSelectedRow] = useState(0);
+  const [selectedCol, setSelectedCol] = useState(0);
+  const [itemRemoved, setItemRemoved] = useState(false);
+  const [inputPin, setInputPin] = useState("");
+  const superVisorPin = "122099";
   const router = useRouter();
   const url = "http://localhost/pos-api/api.php";
 
@@ -129,6 +142,24 @@ const Pos2 = () => {
     setCustomerID(event.target.value);
   };
 
+  const handlePinChange = (e) => {
+    setInputPin(e.target.value);
+  };
+
+  const handlePinSubmit = () => {
+    if (inputPin === superVisorPin) {
+      removeSelectedItem();
+      setInputPin();
+      handleCloseVoidModal();
+    } else {
+      Swal.fire({
+        title: "Error",
+        text: "Invalid PIN. Please try again",
+        icon: "error",
+      });
+    }
+  };
+
   const holdTransaction = () => {
     if (orders.length > 0) {
       setHeldTransactions([...heldTransactions, orders]);
@@ -140,11 +171,28 @@ const Pos2 = () => {
     }
   };
 
-  const restoreTransaction = (index) => {
-    const transactionToRestore = heldTransactions[index];
-    setHeldTransactions(heldTransactions.filter((_, i) => i !== index));
-    setOrders(transactionToRestore);
-  };
+  useEffect(() => {
+    const getAllCustomerID = async () => {
+      try {
+        const response = await axios.get(url, {
+          params: {
+            op: "getAllCustomerID",
+          },
+        });
+
+        if (response.data && response.data !== "") {
+          setRetrievedIDs(response.data);
+          setMsg("");
+        } else {
+          setRetrievedIDs([]);
+          setMsg("No Data");
+        }
+      } catch (error) {
+        console.error("Error fetching customer IDs:", error);
+      }
+    };
+    getAllCustomerID();
+  }, []);
 
   const handleCashChange = (e) => {
     const enteredCash = Number(e.target.value);
@@ -243,6 +291,33 @@ const Pos2 = () => {
     }
   };
 
+  const handleSelectCustomer = async (customerID) => {
+    setSelectedCustomerID(customerID);
+
+    try {
+      const response = await axios.get(url, {
+        params: {
+          op: "retrieveSaveItems",
+          cashierID: currentUser.CID,
+          customerID: customerID,
+        },
+      });
+
+      if (response.status === 200) {
+        // setHeldTransactions(response.data);
+        // You can now use the saved items, for example:
+        // setOrders(response.data);
+        //  setOrders(response.data.items);
+        setOrders(response.data);
+        console.log(response.data);
+      } else {
+        console.error(response.data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching saved items:", error);
+    }
+  };
+
   const handleFunctionsPress = (e) => {
     if (e.ctrlKey && e.key === "f") {
       e.preventDefault();
@@ -283,7 +358,6 @@ const Pos2 = () => {
 
       case "F7":
         e.preventDefault();
-        // handleShowPaymentModal();
         handleShowSavedCustomerPickerModal();
         break;
 
@@ -320,6 +394,63 @@ const Pos2 = () => {
     };
   }, [previousSales, totalAmount]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (orders.length === 0) return;
+
+      if (e.ctrlKey) {
+        switch (e.key.toLowerCase()) {
+          case "arrowup":
+            setSelectedRow((prev) => Math.max(0, prev - 1));
+            break;
+          case "arrowdown":
+            setSelectedRow((prev) => Math.min(orders.length - 1, prev + 1));
+            break;
+          case "arrowleft":
+            setSelectedCol((prev) => Math.max(0, prev - 1));
+            break;
+          case "arrowright":
+            setSelectedCol((prev) => Math.min(3, prev + 1));
+            break;
+          case "v":
+            // removeSelectedItem();
+            handleShowVoidModal();
+            break;
+          default:
+            return;
+        }
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [orders, selectedRow, selectedCol]);
+
+  const removeSelectedItem = () => {
+    if (orders.length === 0) return;
+
+    const newOrders = orders.filter((_, index) => index !== selectedRow);
+    setOrders(newOrders);
+
+    // Adjust the selected row if necessary
+    if (selectedRow >= newOrders.length) {
+      setSelectedRow(Math.max(0, newOrders.length - 1));
+    }
+
+    setItemRemoved(true);
+  };
+
+  useEffect(() => {
+    if (itemRemoved) {
+      const timer = setTimeout(() => setItemRemoved(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [itemRemoved]);
+
   if (loading) {
     return <Loader></Loader>;
   }
@@ -331,6 +462,11 @@ const Pos2 = () => {
   return (
     <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
       <div className="container-fluid">
+        {itemRemoved && (
+          <div className="alert alert-warning text-center" role="alert">
+            Item removed from cart
+          </div>
+        )}
         <h1 className="text-center fw-bold">ROBINSONS BIRINGAN MALL</h1>
         <div className="card">
           <div className="card-body">
@@ -405,6 +541,12 @@ const Pos2 = () => {
                       <h5 className="card-title text-center fs-4 fw-bold">
                         MY CART
                       </h5>
+                      <style jsx>{`
+                        .selected-cell {
+                          background-color: #e0e0e0;
+                          outline: 2px solid #007bff;
+                        }
+                      `}</style>
                       <div className="purchases mb-3">
                         <table className="table table-striped table-hover">
                           <thead>
@@ -416,12 +558,23 @@ const Pos2 = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {orders.map((order, index) => (
-                              <tr key={index}>
-                                <td>{order.p_name}</td>
-                                <td>{order.barcode}</td>
-                                <td>{order.quantity}</td>
-                                <td>{order.price}</td>
+                            {orders.map((order, rowIndex) => (
+                              <tr key={rowIndex}>
+                                {["p_name", "barcode", "quantity", "price"].map(
+                                  (field, colIndex) => (
+                                    <td
+                                      key={colIndex}
+                                      className={
+                                        rowIndex === selectedRow &&
+                                        colIndex === selectedCol
+                                          ? "selected-cell"
+                                          : ""
+                                      }
+                                    >
+                                      {order[field]}
+                                    </td>
+                                  )
+                                )}
                               </tr>
                             ))}
                           </tbody>
@@ -756,8 +909,7 @@ const Pos2 = () => {
             </div>
           </div>
         </InformationModal>
-
-
+        {/* GET ALL CUSTOMER IDs */}
         <InformationModal
           title="Select Customer ID"
           animation={true}
@@ -766,12 +918,56 @@ const Pos2 = () => {
           handleClose={handleCloseSavedCustomerPickerModal}
         >
           <div className="dropdown-custom">
-            <DropdownButton id="dropdown-basic-button" title="SELECT CUSTOMER" autoFocus={true}>
-              <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-              <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-              <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-            </DropdownButton>
+            {retrievedIDs.length > 0 ? (
+              <DropdownButton
+                id="dropdown-basic-button"
+                title="SELECT CUSTOMER"
+                autoFocus={true}
+              >
+                {retrievedIDs.map((id, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    onClick={() => handleSelectCustomer(id)}
+                  >
+                    {id}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            ) : (
+              <p>No customers available</p>
+            )}
           </div>
+        </InformationModal>
+        <InformationModal
+          title="Item Void"
+          animation={true}
+          centered={true}
+          show={showVoidModal}
+          handleClose={handleCloseVoidModal}
+        >
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon3">
+                Supervisor PIN:
+              </span>
+            </div>
+            <input
+              type="text"
+              class="form-control"
+              id="basic-url"
+              aria-describedby="basic-addon3"
+              value={inputPin}
+              onChange={handlePinChange}
+              autoFocus={true}
+            />
+          </div>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={handlePinSubmit}
+          >
+            Submit
+          </button>
         </InformationModal>
         ;
       </div>

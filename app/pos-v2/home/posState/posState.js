@@ -21,6 +21,10 @@ const usePosState = () => {
   const handleShowCustomerIDInput = () => setShowCustomerIDInput(true);
   const handleCloseCustomerIDInput = () => setShowCustomerIDInput(false);
 
+  const [showVoidModal, setShowVoidModal] = useState(false);
+  const handleShowVoidModal = () => setShowVoidModal(true);
+  const handleCloseVoidModal = () => setShowVoidModal(false);
+
   // PAYMENT MODAL
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const handleShowPaymentModal = () => setShowPaymentModal(true);
@@ -46,6 +50,8 @@ const usePosState = () => {
   const quantityInputRef = useRef(null);
   const nextRef = useRef(null);
   const [textColor, setTextColor] = useState({ color: "red" });
+  const [retrievedIDs, setRetrievedIDs] = useState([]);
+  const [selectCustomerID, setSelectedCustomerID] = useState("");
 
   // HOLDING ITEMS
   const [heldTransactions, setHeldTransactions] = useState([]);
@@ -103,6 +109,14 @@ const usePosState = () => {
     setShowSavedCustomerPickerModal,
     handleShowSavedCustomerPickerModal,
     handleCloseSavedCustomerPickerModal,
+    retrievedIDs,
+    setRetrievedIDs,
+    selectCustomerID,
+    setSelectedCustomerID,
+    showVoidModal,
+    setShowVoidModal,
+    handleShowVoidModal,
+    handleCloseVoidModal,
   };
 };
 
